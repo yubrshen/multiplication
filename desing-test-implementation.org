@@ -5,6 +5,182 @@
 #+STARTUP: align overview indent fold nodlcheck hidestars oddeven lognotestate
 #+PROPERTY: mkdirp yes
 
+* Introduction
+
+This is the file of literate programming for the program of displaying multiplication table of first n primes. 
+
+All artifacts required for making the program are deliberated, designed, developed, and documented in this file. 
+Those required artifacts can be generated from this file. 
+
+This file is also the design notes, and design documentation for the program. 
+It can be converted to HTML through emacs org-mode, better readability.
+
+For more detailed information about how this literate programming with org-mode/emacs works, please see the Appendix below. 
+
+* Requirements
+
+The following are the requirements:
+
+Write a program that prints out a multiplication table of the first 10 prime
+numbers.
+
+The program must run from the command line and print one table to
+STDOUT.
+
+The first row and column of the table should have the 10 primes, with
+each cell containing the product of the primes for the corresponding row and
+column.
+
+Notes
+
+• Consider complexity. How fast does your code run? How does it scale?
+
+• Consider cases where we want N primes.
+
+• Do not use the Prime class from stdlib (write your own code).
+
+• Write tests. Try to demonstrate TDD/BDD.
+
+Below are the analysis of the requirements. 
+
+** The user-story
+
+Use Case: Basic
+
+A user retrieves multiplication table of the first n prime numbers. 
+- The user uses command line to retrieve
+- The results should be displayed in STDOUT
+
+- The number of the first prime numbers are 10
+
+- The format should be a table with the first row and column of the table should have the 10 primes, with
+each cell containing the product of the primes for the corresponding row and
+column.
+
+The columns should be aligned, and right justified. 
+
+Use Case: Extended
+
+Users might want to have multiplications of arbitrary number of prime numbers, 
+while keeping the other modality of the use case as the same as the basic one, 
+or as much as possible, when the usability and computation feasibility permit. 
+ 
+User might want to have the multiplication table displayed on web page. 
+
+** Non-user-visible requirements
+1. Performance: 
+
+The program should provide feedback soon enough to user to avoid the user's feeling doubt whether the program is working correctly. 
+
+2. Scalability:
+
+The response of the program should be still acceptable when the number of prime numbers increase. 
+Or some interactive measure should be taken to update the user that progress are being properly made.  
+
+* Architecture
+
+The program can have the following parts:
+- User interface providing the command line interface, displaying the outcome of the program, including, optionally, parsing the parameter of the number of prime numbers.
+- Computation of prime numbers, their multiplications, proper format, and values for UI to displayed.
+
+With the separation of computation from UI, it would be possible in the future to have different UI, such as web interface, or mobile interface. 
+While the computation that is only related to the mathematical model would remain. 
+
+* Design
+
+** Top level entry function: -main
+
+For the user interface, the function -main will implement the command
+
+- It will drive computation to get the calculation results. 
+- It will also call functions to format the results and do the side effect of displaying the results.
+
+** Functions for computation
+
+For the computation, there will be the following functions:
+
+(primes n) 
+
+produces the first n primes starting from the smallest, 2. It returns a lazy sequence to be efficient, and responsive. 
+Care has been taken to reduce computation as much as possible. 
+
+(multi n numbers) 
+
+produces the multiplications of the first n numbers in numbers which may be a lazy-sequence, 
+returns a map with key matrix and value of the computed multiplication table, in terms of sequence of sequences, as sequence of rows
+and a key of max, with the maximum value in the matrix. 
+The maximum value may be used to for the width of numbers for properly formatting the multiplication table. 
+It also returns key of column-row, with value for the header for the columns, and row-header, with value for each row in the table. 
+
+** Functions for representation
+
+For display on STDOUT, the following functions are designed. 
+
+(table-str matrix-map) 
+
+generates the formated string to be displayed for the matrix, based on the output of multi. 
+It adds the column header, and row header, makes sure the columns are right-justified. 
+ 
+(multi-tab-primes n) 
+
+Returns the string suitable to be displayed 
+    for the multiplication table of the first n primes. 
+    This is the highest level function with side effect. It can be called in main to display the multiplication table. 
+
+** Test Driven Development (TDD)
+
+Based on the above design, all functions are developed first with test case(s), which solidify the parameters, and return value, 
+and typical case of input, and the expected output. 
+
+Then the function is developed based on the specification, and test cases. 
+
+The design is done to separate concerns of different nature, and properly abstracted, so that each function's specification, and test cases can be defined with 
+little coupling with the other functions as much as possible. 
+
+midje plug-in is used to implement automated continuous tests. 
+
+As the example is rather simple, there is not much to demonstrate the emphasis on behavior driven development (BDD). 
+The major user behavior is the use case of user requesting multiplication table of first n primes. The use case is supported by the function multi-tab-primes, in turns,
+functions are defined and specified to support multi-tab-primes
+
+** Further Improvement and Extension
+
+- Arbitrary number of the first prime numbers. By parsing command line argument, it's possible to support arbitrary number of prime numbers.
+- Provide multiplication table through other user interface, such as web. The design is layered, it's possible to change the representation mechanism to support 
+    other user interface.
+- The command line at the present is not user friendly. The command line is too long. The jar file may be installed in a directory on CLASSPATH 
+    so that a user does need to specify the direcotry where the jar file located. 
+
+** Algorithm of finding prime numbers
+
+Iterate from existing seeds of primes, to generate the next prime number. The candidate is the largest prime seed plus 2, 4, ..., (sequence of even numbers). 
+The candidacy is confirmed if the candidate cannot be divided by all the prime seeds.
+(Actually, it's sufficient to check all the prime seeds, whose square is not greater than the candidate.)
+
+** Performance optimization for function primse
+
+The complexity of generating the first n pri0me numbers may not be linear to the number n. 
+It takes o(n) number of remainder operations, to tell if a number is a prime or not, 
+but it's hard to tell the complexity to find the next prime number based on the current prime number seeds, 
+as one has to explore the even number bigger than the existing prime numbers. 
+It may not be a function of n at all. 
+It depends on the distribution characteristics of the prime numbers. At the moment, I feel that it's beyond my knowledge and time to investigate 
+the complexity of finding one new prime number. I'll just try to be as economical as possible. 
+
+In order to reduce computation as much as possible, the following optimization considerations are taken:
+- After 2, all prime numbers must be odd number, 
+    so the candidates of the next prime number after existing number would be start from the largest prime number plus 2, to keep the candidates odd numbers.
+
+- If a number is divisible by another number, it must be divisible by certain prime numbers. 
+Such prime numbers should be smaller than the candidate under investigation.
+
+- Furthermore, it's sufficient to check divisibility with smaller prime number p such that p*p should be less or equal to the candidate under investigation, 
+    since, if a number x could be divided by prime number p larger than the square root of x, 
+    then there would be another prime number q such that p*q*r = x, where r is another number. 
+    In this case, q must be smaller than the square root of x, otherwise, p*q would be larger than x.  
+
+All the rest of the computation or transformation is of low complexity, linear to the number of prime numbers. 
+
 * Project meta
 ** Project definition
 #+BEGIN_SRC clojure :tangle project.clj
@@ -28,136 +204,37 @@
 
   ## Installation
 
-  Download from TBD
+  Place the jar file of multiplication-table-of-prime-0.1.0-SNAPSHOT-standalone.jar
+  at a directory which is convenient to access for the user.
 
   ## Usage
 
   Execute the following at the command line:
 
-      $ java -jar multiplication-table-of-prime-0.1.0-standalone.jar [n]
+      $ java -jar multiplication-table-of-prime-0.1.0-SNAPSHOT-standalone.jar
 
-  where n is the number of prime numbers starting from the smallest, 2, for
-  the multiplications. If the parameter is omitted,
-  the default value of 10 will be assumed. 
-
-  ## Options
-
-  None at the moment.
-
-  ## Examples
-
-      $ java -jar multiplication-table-of-prime-0.1.0-standalone.jar 5
-
-  Produces a multiplication table of prime numbers of 2, 3, 5, 7, 9
+  Produces a multiplication table of the first 10 prime numbers of 2, 3, 5, 7, 9, ...
   a table of multiplications of the prime numbers will be displayed at STDOUT. 
 
-  ### Bugs
+  (Assume that the current directory is where the jar file multiplication-table-of-prime-0.1.0-SNAPSHOT-standalone.jar resides.
 
-  ...
+  By default, the jar file
 
-  ### Any Other Sections
-  ### That You Think
-  ### Might be Useful
+  multiplication-table-of-prime-0.1.0-SNAPSHOT-standalone.jar
 
-  ## License
+  is at
 
-  Copyright © 2015 FIXME
+  <project-root-directory>/target/uberjar
 
-  Distributed under the Eclipse Public License either version 1.0 or (at
-  your option) any later version.
+  <project-root-directory> is the place holder for the root directory of the project for multiplication table of prime numbers. 
+  )
 
+  ## Produce the jar file for the program
+
+  At the root directory of the Clojure project, execute the following at the command line:
+
+      $ lein uberjar
 #+END_SRC
-
-* Requirements
-
-The following are the requirements:
-
-Write a program that prints out a multiplication table of the ﬁrst 10 prime
-numbers.
-The program must run from the command line and print one table to
-STDOUT.
-The first row and column of the table should have the 10 primes, with
-each cell containing the product of the primes for the corresponding row and
-column.
-Notes
-• Consider complexity. How fast does your code run? How does it scale?
-• Consider cases where we want N primes.
-• Do not use the Prime class from stdlib (write your own code).
-• Write tests. Try to demonstrate TDD/BDD.
-
-Below are the analysis of the requirements. 
-
-** The user-story
-
-Use Case: Basic
-
-A user retrieve multiplication table of prime numbers. 
-- The user uses command to retrieve
-- The results should be displayed in STDOut
-
-- The number of prime numbers are 10
-
-- The format should be a table with the first row and column of the table should have the 10 primes, with
-each cell containing the product of the primes for the corresponding row and
-column.
-
-Use Case: Extended
-
-Users may want to have multiplications of arbitrary number of prime numbers, 
-while keeping the other modality of the use case as the same as the basic one, 
-or as much as possible, when the usability and computation feasibility permit. 
- 
-The display of the multiplication table should have row and column label with the prime number being multiplied. 
-
-The columns should be aligned, and left justified. 
-
-** Non-user-visible requirements
-1. Performance: 
-The program should provide feedback soon enough to user to avoid the user's feeling doubt whether the program is working correctly. 
-2. Scalability:
-The response of the program should be still acceptable when the number of prime numbers increase. 
-Or some interactive measure should be taken to update the user that progress are being made.  
-
-* Architecture
-
-The program can have the following part:
-- User interface providing the command line interface including parsing the parameter of the number of prime numbers.
-- Computation of prime numbers and their multiplications
-
-* Design
-For the user interface, the function -main will implement the command, including command line argument parsing. 
-- It will drive computation to get the calculation results. 
-- It will also call functions to format the results and do the side effect of displaying the results. 
-
-For the computation, there will be the following functions:
-(primes n) produces the first n primes starting from the smallest, 2. It returns a lazy sequence to be efficient, and responsive. 
-Care should be taken to reduce computation as much as possible. 
-
-(multi n numbers) produces the multiplications of the first n numbers in numbers which may be a lazy-sequence, 
-returns a map with key matrix and value of the computed multiplication table, in terms of sequence of sequences, as sequence of rows
-and a key of max, with the maximum value in the matrix. 
-The maximum value may be used to for the width of numbers for properly formatting the multiplication table
-
-(table-str matrix-map) generates the formated string to be displayed for the results, based on the output of multi. 
- 
-** Algorithm of finding prime numbers
-
-Iterate from existing seeds of primes, to generate the next prime number. The candidate is the largest prime seed plus 2, 4, ..., (sequence of even numbers). 
-The candidacy is confirmed if the candidate cannot be divided by all the prime seeds.
-(Actually, it's sufficient to check all the prime seeds, whose sequare is not greater than the candidate.)
-
-** Performance optimization for function primse
-
-In order to reduce computation as much as possible, the following optimization considerations are taken:
-- After 2, all prime numbers must be odd number, 
-    so the candidates of the next prime number after existing number would be start from the largest prime number plus 2, to keep the candidates odd numbers.
-
-- If number is divisible by a number, it must be divisible by certain prime numbers. Such prime numbers should be smaller than the candidate under investigation.
-
-- Furthermore, it's sufficient to check divisibility with smaller prime number p such that p*p should be less or equal to the candidate under investigation, 
-    since, if a number x could be divided by prime number p larger than the square root of x, 
-    then there would be another prime number q such that p*q*r = x, where r is another number. 
-    In this case, q must be smaller than the square root of x, otherwise, p*q would be langer than x.  
 
 * Source-code
 
@@ -168,10 +245,6 @@ In order to reduce computation as much as possible, the following optimization c
     (:require [midje.sweet :refer :all]
               [multiplication-table-of-prime.core :refer :all]
               ))
-
-  (facts "a-test"
-    (fact "FIXME, I fail."
-          (= 0 0) => true))
 #+END_SRC
 
 #+NAME: core
@@ -195,7 +268,10 @@ In order to reduce computation as much as possible, the following optimization c
 <<primes-test>>
 #+NAME:primes
 #+BEGIN_SRC clojure :tangle src/multiplication_table_of_prime/core.clj
-  (defn primes [n]
+  (defn primes
+    "Produces the first n primes starting from the smallest, 2. It returns a lazy sequence."
+
+    [n]
     (if (= n 1)
       [2]
       (nth 
@@ -226,10 +302,18 @@ In order to reduce computation as much as possible, the following optimization c
 <<multi-test>>
 #+NAME:multi
 #+BEGIN_SRC clojure :tangle src/multiplication_table_of_prime/core.clj
-  (defn multi [n numbers]
+  (defn multi
+    "Produces the multiplications of the first n numbers in numbers which may be a lazy-sequence, 
+    returns a map with key matrix and value of the computed multiplication table, in terms of sequence of sequences, as sequence of rows
+    and a key of max, with the maximum value in the matrix. 
+    The maximum value may be used to for the width of numbers for properly formatting the multiplication table. 
+    It also returns key of column-row, with value for the header for the columns, 
+    and row-header, with value for each row in the table."
+
+    [n numbers]
     (let [numbers-realized (take n numbers)
           matrix (for [x numbers-realized]
-            (for [y numbers-realized] (* x y)))
+                   (for [y numbers-realized] (* x y)))
           max-value (#(* % %) (last numbers-realized))]
       {:matrix matrix :max max-value
        :row-header numbers-realized :column-header numbers-realized}))
@@ -237,6 +321,8 @@ In order to reduce computation as much as possible, the following optimization c
 
 <<multi>>
 
+
+** table-str
 #+NAME:table-str-test
 #+BEGIN_SRC clojure :tangle test/multiplication_table_of_prime/core_test.clj
   (facts "about `table-str'"
@@ -251,19 +337,22 @@ In order to reduce computation as much as possible, the following optimization c
    )
  #+END_SRC
 
-** table-str
 <<table-str-test>>
 #+NAME:table-str
 #+BEGIN_SRC clojure :tangle src/multiplication_table_of_prime/core.clj
-  (defn table-str [{:keys [matrix max row-header column-header]}]
+  (defn table-str 
+    "generates the formated string to be displayed for the matrix, based on the output of multi. 
+    It adds the column header, and row header, makes sure the columns are right-justified. "
+
+    [{:keys [matrix max row-header column-header]}]
     (let [width (count (str max))]
       (let [number-str #(format (str " %" width "d") %)
-            column-header-width (count (number-str (first column-header)))]
+            row-header-width (count (number-str (first row-header)))]
         (str
-         (apply str (concat (repeat column-header-width " ") (map number-str row-header))) "\n"
+         (apply str (concat (repeat row-header-width " ") (map number-str column-header))) "\n"
          (clojure.string/join "\n"
                               (for [i (range (count matrix))]
-                                (str (number-str (nth column-header i))
+                                (str (number-str (nth row-header i))
                                      (apply str (for [x (nth matrix i)] (number-str x))))))))))
  #+END_SRC
 
@@ -271,7 +360,6 @@ In order to reduce computation as much as possible, the following optimization c
 
 ** multi-tab-primes
 
-Verify if multiplication table of prime numbers can be produced as expected. 
 
 #+NAME:multi-tab-primes-test
 #+BEGIN_SRC clojure :tangle test/multiplication_table_of_prime/core_test.clj
@@ -284,13 +372,15 @@ Verify if multiplication table of prime numbers can be produced as expected.
 <<multi-tab-primes-test>>
 #+NAME:multi-tab-primes
 #+BEGIN_SRC clojure :tangle src/multiplication_table_of_prime/core.clj
-  (defn multi-tab-primes [n]
-    (let [prime-nbrs (primes n)
-          ]
+  (defn multi-tab-primes
+    "Returns the string suitable to be displayed 
+    for the multiplication table of the first n primes."
+
+    [n]
+    (let [prime-nbrs (primes n)]
       (->> prime-nbrs
            (multi n,)
-           table-str))
-   )
+           table-str)))
  #+END_SRC
 
 <<multi-tab-primes>>
@@ -299,7 +389,8 @@ Verify if multiplication table of prime numbers can be produced as expected.
 #+NAME:main
 #+BEGIN_SRC clojure :tangle src/multiplication_table_of_prime/core.clj
   (defn -main
-    "I don't do a whole lot ... yet."
+    "Calculate and display multiplication table of the first 10 prime numbers."
+
     [& args]
     (println (multi-tab-primes 10)))
 
