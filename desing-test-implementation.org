@@ -137,6 +137,8 @@ Then the function is developed based on the specification, and test cases.
 The design is done to separate concerns of different nature, and properly abstracted, so that each function's specification, and test cases can be defined with 
 little coupling with the other functions as much as possible. 
 
+Especially, side effect is only limited to the function -main, so that all other function can be tested by values alone, taking advantage of persistence.
+
 midje plug-in is used to implement automated continuous tests. 
 
 As the example is rather simple, there is not much to demonstrate the emphasis on behavior driven development (BDD). 
