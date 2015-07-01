@@ -17,6 +17,8 @@ It can be converted to HTML through emacs org-mode, better readability.
 
 For more detailed information about how this literate programming with org-mode/emacs works, please see the Appendix below. 
 
+To compile the program, please read README section below, or read the generated said file. 
+
 * Requirements
 
 The following are the requirements:
@@ -112,6 +114,8 @@ and a key of max, with the maximum value in the matrix.
 The maximum value may be used to for the width of numbers for properly formatting the multiplication table. 
 It also returns key of column-row, with value for the header for the columns, and row-header, with value for each row in the table. 
 
+In order to reduce repeated computation of multiplications, a function to perform multiplication is transformed with memoize, in order to cache computation results.
+
 ** Functions for representation
 
 For display on STDOUT, the following functions are designed. 
@@ -121,6 +125,8 @@ For display on STDOUT, the following functions are designed.
 generates the formated string to be displayed for the matrix, based on the output of multi. 
 It adds the column header, and row header, makes sure the columns are right-justified. 
  
+** Overall integration
+
 (multi-tab-primes n) 
 
 Returns the string suitable to be displayed 
@@ -159,7 +165,7 @@ Iterate from existing seeds of primes, to generate the next prime number. The ca
 The candidacy is confirmed if the candidate cannot be divided by all the prime seeds.
 (Actually, it's sufficient to check all the prime seeds, whose square is not greater than the candidate.)
 
-** Performance optimization for function primse
+** Performance optimization for function primse, and others
 
 The complexity of generating the first n pri0me numbers may not be linear to the number n. 
 It takes o(n) number of remainder operations, to tell if a number is a prime or not, 
@@ -168,6 +174,8 @@ as one has to explore the even number bigger than the existing prime numbers.
 It may not be a function of n at all. 
 It depends on the distribution characteristics of the prime numbers. At the moment, I feel that it's beyond my knowledge and time to investigate 
 the complexity of finding one new prime number. I'll just try to be as economical as possible. 
+
+In the future, more might be done in controlling the space for prime candidates in additional to assuming it to be odd numbers larger than the current existing prime numebers. 
 
 In order to reduce computation as much as possible, the following optimization considerations are taken:
 - After 2, all prime numbers must be odd number, 
@@ -181,7 +189,34 @@ Such prime numbers should be smaller than the candidate under investigation.
     then there would be another prime number q such that p*q*r = x, where r is another number. 
     In this case, q must be smaller than the square root of x, otherwise, p*q would be larger than x.  
 
-All the rest of the computation or transformation is of low complexity, linear to the number of prime numbers. 
+All the rest of the computation or transformation is of lower complexity, o(n*n), where n is the number of prime numbers.
+
+As a*b = b*a, the multiplication can be further reduced by about half by doing memoize the computation. 
+
+The total elapse time of multi-tab-primes for 10 prime numbers is about 33 msecs, when running with 
+    
+java -jar multiplication-table-of-prime-0.1.0-SNAPSHOT-standalone.jar
+
+However, when running with 
+
+leni run
+
+It takes about 13 msecs. The difference is yet to know. 
+
+By looking at more detailed elapsed time:
+
+#+BEGIN_SRC quote
+"Elapsed time: 7.731669 msecs" ; (primes 10)
+"Elapsed time: 2.605125 msecs" ; (multi, 
+"Elapsed time: 21.287298 msecs" ; (table-str,
+#+END_SRC
+I'm surprised that it takes more than 21 msecs to do string format with table-str, more than that of (primes 10) to generate the first 10 prime numbers. 
+It may change when further prime numbers becomes less dense. 
+
+Overall, it seems the response time is acceptable for current requirements. 
+
+It would be faster to combine multi and table-str to directly produce the string represenation of the multiplication table, save one round of traversing the matrix. 
+But I feel that it's more coupled. This may be discussed further.  
 
 * Project meta
 ** Project definition
@@ -314,9 +349,10 @@ All the rest of the computation or transformation is of low complexity, linear t
 
     [n numbers]
     (let [numbers-realized (take n numbers)
+          *_remembered (memoize (fn [x y] (* x y)))
           matrix (for [x numbers-realized]
-                   (for [y numbers-realized] (* x y)))
-          max-value (#(* % %) (last numbers-realized))]
+                   (for [y numbers-realized] (*_remembered x y)))
+          max-value (#(*_remembered % %) (last numbers-realized))]
       {:matrix matrix :max max-value
        :row-header numbers-realized :column-header numbers-realized}))
  #+END_SRC
@@ -379,10 +415,15 @@ All the rest of the computation or transformation is of low complexity, linear t
     for the multiplication table of the first n primes."
 
     [n]
-    (let [prime-nbrs (primes n)]
-      (->> prime-nbrs
-           (multi n,)
-           table-str)))
+    (let [prime-nbrs (time (primes n))
+          mat (time (multi n prime-nbrs))
+          s (time (table-str mat))]
+      s
+      ;; (->> prime-nbrs
+      ;;      (multi n,)
+      ;;      table-str)
+      )
+    )
  #+END_SRC
 
 <<multi-tab-primes>>
@@ -394,7 +435,10 @@ All the rest of the computation or transformation is of low complexity, linear t
     "Calculate and display multiplication table of the first 10 prime numbers."
 
     [& args]
-    (println (multi-tab-primes 10)))
+    ;; Check the response time of generating the multiplication table.
+    ;; (println (time (multi-tab-primes 10)))
+    (println (multi-tab-primes 10))
+    )
 
 #+END_SRC
 
