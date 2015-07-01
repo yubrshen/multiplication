@@ -1,0 +1,402 @@
+#+TITLE: Multiplication Tables of Prime Numbers
+#+AUTHOR: Yu Shen
+#+EMAIL: yubrshen@gmail.com
+#+LANGUAGE: en
+#+STARTUP: align overview indent fold nodlcheck hidestars oddeven lognotestate
+#+PROPERTY: mkdirp yes
+
+* Project meta
+** Project definition
+#+BEGIN_SRC clojure :tangle project.clj
+  (defproject multiplication-table-of-prime "0.1.0-SNAPSHOT"
+    :description "This provides multiplication table of prime numbers"
+    :url ""
+    :license {:name "Eclipse Public License"
+              :url "http://www.eclipse.org/legal/epl-v10.html"}
+    :dependencies [[org.clojure/clojure "1.6.0"]]
+    :main ^:skip-aot multiplication-table-of-prime.core
+    :target-path "target/%s"
+    :profiles {:uberjar {:aot :all}
+               :dev {:dependencies [[midje "1.6.3"]]}})
+#+END_SRC
+
+** The README
+#+BEGIN_SRC markdown :tangle README.md
+  # multiplication-table-of-prime
+
+  This programs provides multiplication table of prime numbers.
+
+  ## Installation
+
+  Download from TBD
+
+  ## Usage
+
+  Execute the following at the command line:
+
+      $ java -jar multiplication-table-of-prime-0.1.0-standalone.jar [n]
+
+  where n is the number of prime numbers starting from the smallest, 2, for
+  the multiplications. If the parameter is omitted,
+  the default value of 10 will be assumed. 
+
+  ## Options
+
+  None at the moment.
+
+  ## Examples
+
+      $ java -jar multiplication-table-of-prime-0.1.0-standalone.jar 5
+
+  Produces a multiplication table of prime numbers of 2, 3, 5, 7, 9
+  a table of multiplications of the prime numbers will be displayed at STDOUT. 
+
+  ### Bugs
+
+  ...
+
+  ### Any Other Sections
+  ### That You Think
+  ### Might be Useful
+
+  ## License
+
+  Copyright © 2015 FIXME
+
+  Distributed under the Eclipse Public License either version 1.0 or (at
+  your option) any later version.
+
+#+END_SRC
+
+* Requirements
+
+The following are the requirements:
+
+Write a program that prints out a multiplication table of the ﬁrst 10 prime
+numbers.
+The program must run from the command line and print one table to
+STDOUT.
+The first row and column of the table should have the 10 primes, with
+each cell containing the product of the primes for the corresponding row and
+column.
+Notes
+• Consider complexity. How fast does your code run? How does it scale?
+• Consider cases where we want N primes.
+• Do not use the Prime class from stdlib (write your own code).
+• Write tests. Try to demonstrate TDD/BDD.
+
+Below are the analysis of the requirements. 
+
+** The user-story
+
+Use Case: Basic
+
+A user retrieve multiplication table of prime numbers. 
+- The user uses command to retrieve
+- The results should be displayed in STDOut
+
+- The number of prime numbers are 10
+
+- The format should be a table with the first row and column of the table should have the 10 primes, with
+each cell containing the product of the primes for the corresponding row and
+column.
+
+Use Case: Extended
+
+Users may want to have multiplications of arbitrary number of prime numbers, 
+while keeping the other modality of the use case as the same as the basic one, 
+or as much as possible, when the usability and computation feasibility permit. 
+ 
+The display of the multiplication table should have row and column label with the prime number being multiplied. 
+
+The columns should be aligned, and left justified. 
+
+** Non-user-visible requirements
+1. Performance: 
+The program should provide feedback soon enough to user to avoid the user's feeling doubt whether the program is working correctly. 
+2. Scalability:
+The response of the program should be still acceptable when the number of prime numbers increase. 
+Or some interactive measure should be taken to update the user that progress are being made.  
+
+* Architecture
+
+The program can have the following part:
+- User interface providing the command line interface including parsing the parameter of the number of prime numbers.
+- Computation of prime numbers and their multiplications
+
+* Design
+For the user interface, the function -main will implement the command, including command line argument parsing. 
+- It will drive computation to get the calculation results. 
+- It will also call functions to format the results and do the side effect of displaying the results. 
+
+For the computation, there will be the following functions:
+(primes n) produces the first n primes starting from the smallest, 2. It returns a lazy sequence to be efficient, and responsive. 
+Care should be taken to reduce computation as much as possible. 
+
+(multi n numbers) produces the multiplications of the first n numbers in numbers which may be a lazy-sequence, 
+returns a map with key matrix and value of the computed multiplication table, in terms of sequence of sequences, as sequence of rows
+and a key of max, with the maximum value in the matrix. 
+The maximum value may be used to for the width of numbers for properly formatting the multiplication table
+
+(table-str matrix-map) generates the formated string to be displayed for the results, based on the output of multi. 
+ 
+** Algorithm of finding prime numbers
+
+Iterate from existing seeds of primes, to generate the next prime number. The candidate is the largest prime seed plus 2, 4, ..., (sequence of even numbers). 
+The candidacy is confirmed if the candidate cannot be divided by all the prime seeds.
+(Actually, it's sufficient to check all the prime seeds, whose sequare is not greater than the candidate.)
+
+** Performance optimization for function primse
+
+In order to reduce computation as much as possible, the following optimization considerations are taken:
+- After 2, all prime numbers must be odd number, 
+    so the candidates of the next prime number after existing number would be start from the largest prime number plus 2, to keep the candidates odd numbers.
+
+- If number is divisible by a number, it must be divisible by certain prime numbers. Such prime numbers should be smaller than the candidate under investigation.
+
+- Furthermore, it's sufficient to check divisibility with smaller prime number p such that p*p should be less or equal to the candidate under investigation, 
+    since, if a number x could be divided by prime number p larger than the square root of x, 
+    then there would be another prime number q such that p*q*r = x, where r is another number. 
+    In this case, q must be smaller than the square root of x, otherwise, p*q would be langer than x.  
+
+* Source-code
+
+** Preamble
+
+#+BEGIN_SRC clojure :tangle test/multiplication_table_of_prime/core_test.clj
+  (ns multiplication-table-of-prime.core-test
+    (:require [midje.sweet :refer :all]
+              [multiplication-table-of-prime.core :refer :all]
+              ))
+
+  (facts "a-test"
+    (fact "FIXME, I fail."
+          (= 0 0) => true))
+#+END_SRC
+
+#+NAME: core
+#+BEGIN_SRC clojure :tangle src/multiplication_table_of_prime/core.clj
+  (ns multiplication-table-of-prime.core
+  (:gen-class))
+#+END_SRC
+
+** primes
+
+#+NAME:primes-test
+#+BEGIN_SRC clojure :tangle test/multiplication_table_of_prime/core_test.clj
+  (facts "about `primes'"
+         (fact "First prime number"
+               (primes 1) => [2])
+         (fact "More prime numbers"
+               (primes 3) => [2 3 5])
+         (fact "First 10 prime numbers"
+               (primes 10) => [2 3 5 7 11 13 17 19 23 29]))
+ #+END_SRC
+<<primes-test>>
+#+NAME:primes
+#+BEGIN_SRC clojure :tangle src/multiplication_table_of_prime/core.clj
+  (defn primes [n]
+    (if (= n 1)
+      [2]
+      (nth 
+       (iterate
+        (fn [seeds]
+          (conj seeds (first
+                       (filter (fn [c] (every? (fn [p] (< 0 (mod c p))) (filter (fn [p] (<= (* p p) c)) seeds)))
+                               (map (partial + (last seeds))
+                                    (filter even? (drop 1 (range)))))))) [2 3])
+       (- n 2))))
+ #+END_SRC
+
+<<primes>>
+
+** multi
+
+#+NAME:multi-test
+#+BEGIN_SRC clojure :tangle test/multiplication_table_of_prime/core_test.clj
+  (facts "about `multi'"
+         (fact "Some multiplications"
+               (multi 3 (range)) => {:matrix [[0 0 0]
+                                      [0 1 2]
+                                      [0 2 4]]
+                                     :max 4
+                                     :row-header [0 1 2]
+                                     :column-header [0 1 2]}))
+ #+END_SRC
+<<multi-test>>
+#+NAME:multi
+#+BEGIN_SRC clojure :tangle src/multiplication_table_of_prime/core.clj
+  (defn multi [n numbers]
+    (let [numbers-realized (take n numbers)
+          matrix (for [x numbers-realized]
+            (for [y numbers-realized] (* x y)))
+          max-value (#(* % %) (last numbers-realized))]
+      {:matrix matrix :max max-value
+       :row-header numbers-realized :column-header numbers-realized}))
+ #+END_SRC
+
+<<multi>>
+
+#+NAME:table-str-test
+#+BEGIN_SRC clojure :tangle test/multiplication_table_of_prime/core_test.clj
+  (facts "about `table-str'"
+         (fact "matrix as a table as a string"
+               (table-str {:matrix [[0 0 0]
+                                        [0 1 2]
+                                        [0 200 4]]
+                           :max 200
+                           :row-header [0 1 2]
+                           :column-header [0 1 2]})
+               => "       0   1   2\n   0   0   0   0\n   1   0   1   2\n   2   0 200   4")
+   )
+ #+END_SRC
+
+** table-str
+<<table-str-test>>
+#+NAME:table-str
+#+BEGIN_SRC clojure :tangle src/multiplication_table_of_prime/core.clj
+  (defn table-str [{:keys [matrix max row-header column-header]}]
+    (let [width (count (str max))]
+      (let [number-str #(format (str " %" width "d") %)
+            column-header-width (count (number-str (first column-header)))]
+        (str
+         (apply str (concat (repeat column-header-width " ") (map number-str row-header))) "\n"
+         (clojure.string/join "\n"
+                              (for [i (range (count matrix))]
+                                (str (number-str (nth column-header i))
+                                     (apply str (for [x (nth matrix i)] (number-str x))))))))))
+ #+END_SRC
+
+<<table-str>>
+
+** multi-tab-primes
+
+Verify if multiplication table of prime numbers can be produced as expected. 
+
+#+NAME:multi-tab-primes-test
+#+BEGIN_SRC clojure :tangle test/multiplication_table_of_prime/core_test.clj
+  (facts "about `multi-tab-primes'"
+         (fact "multiplication table for the first 3 prime numbers"
+               (multi-tab-primes 3) =>
+               "     2  3  5\n  2  4  6 10\n  3  6  9 15\n  5 10 15 25")
+   )
+ #+END_SRC
+<<multi-tab-primes-test>>
+#+NAME:multi-tab-primes
+#+BEGIN_SRC clojure :tangle src/multiplication_table_of_prime/core.clj
+  (defn multi-tab-primes [n]
+    (let [prime-nbrs (primes n)
+          ]
+      (->> prime-nbrs
+           (multi n,)
+           table-str))
+   )
+ #+END_SRC
+
+<<multi-tab-primes>>
+
+** main
+#+NAME:main
+#+BEGIN_SRC clojure :tangle src/multiplication_table_of_prime/core.clj
+  (defn -main
+    "I don't do a whole lot ... yet."
+    [& args]
+    (println (multi-tab-primes 10)))
+
+#+END_SRC
+
+* Appendix
+
+This file is for literate programming. It's adapted from Kai Wu's "Clojure Default/Project Skeleton, Using Org Literate Programming"
+
+The following excepted from his introduction.
+
+** Meta: this file, Clojure + Org → LP, etc.
+You're looking at a literate programming (LP) file, specifically an
+[[http://orgmode.org][Org mode]] formatted file combining both documentation (Org's structured
+markup) and code blocks (Clojure code).
+
+For best results please *use Emacs 24.3 or later to view this* =.org=
+*file*. If you're looking at this on Github.com, STOP - the rendering
+there is neither complete nor correct!
+
+*** The *benefits* of LP using Emacs + Org
+1. Docs matter, a lot. With LP, documentation is integral to
+   development, never an afterthought.
+   - For all but small throwaway systems, you're likely keeping a
+     separate file of development notes already; LP would integrate
+     that.
+2. With one LP file, avoid the incidental/inessential complexity of
+   the filesystem: avoid context-switch overhead moving between files,
+   and sidestep your language's imposed filesystem structure.
+3. Org rocks for prose:
+   - Org's plain-text *markup is lightweight*, yet more powerful than
+     Markdown, and cleaner than rST.
+   - The *structural editing* provided by Org documents lets you
+     organize your thoughts/writing/code very quickly.  With good
+     structure even major revisions are easy.
+   - Org's exporter lets your *write-once, express-many-times*: you
+     can export an Org file to HTML (e.g. for blogging) or LaTeX
+     (for serious publishing).
+   - It's easy to version-control Org files.
+4. Org rocks for code:
+   - Each code block has flexible granularity: can be named and
+     referred to; evaluated or not; have data sent in or exported;
+     specify different REPL sessions; specify different target/tangled
+     files.
+   - Code blocks are syntax-highlighted.
+   - Code blocks are ready to edit: jump to major-mode editing easily.
+   - A single Org file can mix different languages.
+5. Meta-development, manage complexity from a coherent perspective: a
+   unified, single-file approach encourages holistic software
+   development and exposition, in a natural order, using structure to
+   enhance understanding.  LP is not just documentation and code
+   together: it's a *process and abstraction unifying the development
+   lifecycle*: requirements, architecture, design, code, tests,
+   deployment, and maintenance - can all be bound coherently in one
+   active format.
+
+
+** Using this file
+*** Prerequisites
+1. A recent version of Emacs, 24.3+.
+2. Both org-mode (included w/ Emacs 24) and =clojure-mode= installed;
+   use Emacs ELPA as needed.
+   - Consider using an Emacs "starter package" that provides a good
+     baseline, like [[http://batsov.com/prelude/][Emacs Prelude]] or [[http://overtone.github.io/emacs-live/][Emacs Live]].
+
+Then if you start Emacs and load this file, you'll see it the way it's
+meant to be seen: as a multi-level, hierarchically organized and
+structured literate code file, w/ syntax-highlighted code blocks.  
+
+*** Weaving and tangling
+To use the original Knuth terminology, this single file can be /woven/
+into documentation, or /tangled/ to code.
+
+**** Weave/export, to documentation
++ To /weave/: the Org equivalent of /weaving/ is to export this file,
+  typically to HTML or LaTeX/PDF. The keystroke is =C-c-e= i.e. hold
+  down the Control key while pressing "c" then "e" to view the export
+  options.
+  - e.g. export this file to HTML with =CTRL-c-e h= or, to see it
+    immediately in a browser window, =CTRL-c-e b=.
++ You don't have to export this file though; if/when you're comfy in
+  Emacs, the Org format itself is great.
+
+**** Tangle, to code
++ To /tangle/: in Org, it's the same word/term. =C-c-v-t= will cause
+  all designated code blocks in this file to appear in the filesystem.
+  Here, the code blocks go to files and directories matching a new
+  Clojure app, as would be produced by =lein new app
+  the-project-name=.
+
+*** Other coolness
+- =SHIFT-TAB= will *cycle* the display: top-level headings only, all
+  headings, or fully-expanded.
+- Within a code block, =CTRL-c= ='= will open a buffer to edit the
+  code. For full power, be sure =clojure-mode=, =paredit=, and
+  =nrepl= are installed.
+- Org docs: see [[http://orgmode.org/org.html][main documentation]], especially sections on [[http://orgmode.org/org.html#Document-Structure][structure]],
+  [[http://orgmode.org/org.html#Hyperlinks][links]], [[http://orgmode.org/org.html#Markup][markup]], and [[http://orgmode.org/org.html#Working-With-Source-Code][literate programming]] features.
+
+
