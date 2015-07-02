@@ -1,0 +1,1091 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>Multiplication Tables of Prime Numbers</title>
+<!-- 2015-07-02 Thu 08:14 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="Yu Shen" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { color: green; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  pre.src-sh:before    { content: 'sh'; }
+  pre.src-bash:before  { content: 'sh'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-R:before     { content: 'R'; }
+  pre.src-perl:before  { content: 'Perl'; }
+  pre.src-java:before  { content: 'Java'; }
+  pre.src-sql:before   { content: 'SQL'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.right  { text-align: center;  }
+  th.left   { text-align: center;   }
+  th.center { text-align: center; }
+  td.right  { text-align: right;  }
+  td.left   { text-align: left;   }
+  td.center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara:nth-child(2) { display: inline; }
+  .footpara { display: block; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  /*]]>*/-->
+</style>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">Multiplication Tables of Prime Numbers</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. Introduction</a></li>
+<li><a href="#sec-2">2. Requirements</a>
+<ul>
+<li><a href="#sec-2-1">2.1. The user-story</a></li>
+<li><a href="#sec-2-2">2.2. Non-user-visible requirements</a></li>
+</ul>
+</li>
+<li><a href="#sec-3">3. Architecture</a></li>
+<li><a href="#sec-4">4. Design</a>
+<ul>
+<li><a href="#sec-4-1">4.1. Top level entry function: -main</a></li>
+<li><a href="#sec-4-2">4.2. Functions for computation</a></li>
+<li><a href="#sec-4-3">4.3. Functions for representation</a></li>
+<li><a href="#sec-4-4">4.4. Overall integration</a></li>
+<li><a href="#sec-4-5">4.5. Test Driven Development (TDD)</a></li>
+<li><a href="#sec-4-6">4.6. Further Improvement and Extension</a></li>
+<li><a href="#sec-4-7">4.7. Algorithm of finding prime numbers</a></li>
+<li><a href="#sec-4-8">4.8. Performance optimization for function primse, and others</a></li>
+</ul>
+</li>
+<li><a href="#sec-5">5. Project meta</a>
+<ul>
+<li><a href="#sec-5-1">5.1. Project definition</a></li>
+<li><a href="#sec-5-2">5.2. The README</a></li>
+</ul>
+</li>
+<li><a href="#sec-6">6. Source-code</a>
+<ul>
+<li><a href="#sec-6-1">6.1. Preamble</a></li>
+<li><a href="#sec-6-2">6.2. primes</a></li>
+<li><a href="#sec-6-3">6.3. multi</a></li>
+<li><a href="#sec-6-4">6.4. table-str</a></li>
+<li><a href="#sec-6-5">6.5. multi-tab-primes</a></li>
+<li><a href="#sec-6-6">6.6. main</a></li>
+</ul>
+</li>
+<li><a href="#sec-7">7. Appendix</a>
+<ul>
+<li><a href="#sec-7-1">7.1. Meta: this file, Clojure + Org → LP, etc.</a>
+<ul>
+<li><a href="#sec-7-1-1">7.1.1. The <b>benefits</b> of LP using Emacs + Org</a></li>
+</ul>
+</li>
+<li><a href="#sec-7-2">7.2. Using this file</a>
+<ul>
+<li><a href="#sec-7-2-1">7.2.1. Prerequisites</a></li>
+<li><a href="#sec-7-2-2">7.2.2. Weaving and tangling</a></li>
+<li><a href="#sec-7-2-3">7.2.3. Other coolness</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> Introduction</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+This is the file of literate programming for the program of displaying multiplication table of first n primes. 
+</p>
+
+<p>
+All artifacts required for making the program are deliberated, designed, developed, and documented in this file. 
+Those required artifacts can be generated from this file. 
+</p>
+
+<p>
+This file is also the design notes, and design documentation for the program. 
+It can be converted to HTML through emacs org-mode, better readability.
+</p>
+
+<p>
+For more detailed information about how this literate programming with org-mode/emacs works, please see the Appendix below. 
+</p>
+
+<p>
+To compile the program, please read README section below, or read the generated said file. 
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> Requirements</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+The following are the requirements:
+</p>
+
+<p>
+Write a program that prints out a multiplication table of the first 10 prime
+numbers.
+</p>
+
+<p>
+The program must run from the command line and print one table to
+STDOUT.
+</p>
+
+<p>
+The first row and column of the table should have the 10 primes, with
+each cell containing the product of the primes for the corresponding row and
+column.
+</p>
+
+<p>
+Notes
+</p>
+
+<p>
+• Consider complexity. How fast does your code run? How does it scale?
+</p>
+
+<p>
+• Consider cases where we want N primes.
+</p>
+
+<p>
+• Do not use the Prime class from stdlib (write your own code).
+</p>
+
+<p>
+• Write tests. Try to demonstrate TDD/BDD.
+</p>
+
+<p>
+Below are the analysis of the requirements. 
+</p>
+</div>
+
+<div id="outline-container-sec-2-1" class="outline-3">
+<h3 id="sec-2-1"><span class="section-number-3">2.1</span> The user-story</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+Use Case: Basic
+</p>
+
+<p>
+A user retrieves multiplication table of the first n prime numbers. 
+</p>
+<ul class="org-ul">
+<li>The user uses command line to retrieve
+</li>
+<li>The results should be displayed in STDOUT
+</li>
+
+<li>The number of the first prime numbers are 10
+</li>
+
+<li>The format should be a table with the first row and column of the table should have the 10 primes, with
+</li>
+</ul>
+<p>
+each cell containing the product of the primes for the corresponding row and
+column.
+</p>
+
+<p>
+The columns should be aligned, and right justified. 
+</p>
+
+<p>
+Use Case: Extended
+</p>
+
+<p>
+Users might want to have multiplications of arbitrary number of prime numbers, 
+while keeping the other modality of the use case as the same as the basic one, 
+or as much as possible, when the usability and computation feasibility permit. 
+</p>
+
+<p>
+User might want to have the multiplication table displayed on web page. 
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-2-2" class="outline-3">
+<h3 id="sec-2-2"><span class="section-number-3">2.2</span> Non-user-visible requirements</h3>
+<div class="outline-text-3" id="text-2-2">
+<ol class="org-ol">
+<li>Performance: 
+</li>
+</ol>
+
+<p>
+The program should provide feedback soon enough to user to avoid the user's feeling doubt whether the program is working correctly. 
+</p>
+
+<ol class="org-ol">
+<li>Scalability:
+</li>
+</ol>
+
+<p>
+The response of the program should be still acceptable when the number of prime numbers increase. 
+Or some interactive measure should be taken to update the user that progress are being properly made.  
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> Architecture</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+The program can have the following parts:
+</p>
+<ul class="org-ul">
+<li>User interface providing the command line interface, displaying the outcome of the program, including, optionally, parsing the parameter of the number of prime numbers.
+</li>
+<li>Computation of prime numbers, their multiplications, proper format, and values for UI to displayed.
+</li>
+</ul>
+
+<p>
+With the separation of computation from UI, it would be possible in the future to have different UI, such as web interface, or mobile interface. 
+While the computation that is only related to the mathematical model would remain. 
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> Design</h2>
+<div class="outline-text-2" id="text-4">
+</div><div id="outline-container-sec-4-1" class="outline-3">
+<h3 id="sec-4-1"><span class="section-number-3">4.1</span> Top level entry function: -main</h3>
+<div class="outline-text-3" id="text-4-1">
+<p>
+For the user interface, the function -main will implement the command
+</p>
+
+<ul class="org-ul">
+<li>It will drive computation to get the calculation results. 
+</li>
+<li>It will also call functions to format the results and do the side effect of displaying the results.
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-4-2" class="outline-3">
+<h3 id="sec-4-2"><span class="section-number-3">4.2</span> Functions for computation</h3>
+<div class="outline-text-3" id="text-4-2">
+<p>
+For the computation, there will be the following functions:
+</p>
+
+<p>
+(primes n) 
+</p>
+
+<p>
+produces the first n primes starting from the smallest, 2. It returns a lazy sequence to be efficient, and responsive. 
+Care has been taken to reduce computation as much as possible. 
+</p>
+
+<p>
+(multi n numbers) 
+</p>
+
+<p>
+produces the multiplications of the first n numbers in numbers which may be a lazy-sequence, 
+returns a map with key matrix and value of the computed multiplication table, in terms of sequence of sequences, as sequence of rows
+and a key of max, with the maximum value in the matrix. 
+The maximum value may be used to for the width of numbers for properly formatting the multiplication table. 
+It also returns key of column-row, with value for the header for the columns, and row-header, with value for each row in the table. 
+</p>
+
+<p>
+In order to reduce repeated computation of multiplications, a function to perform multiplication is transformed with memoize, in order to cache computation results.
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-4-3" class="outline-3">
+<h3 id="sec-4-3"><span class="section-number-3">4.3</span> Functions for representation</h3>
+<div class="outline-text-3" id="text-4-3">
+<p>
+For display on STDOUT, the following functions are designed. 
+</p>
+
+<p>
+(table-str matrix-map) 
+</p>
+
+<p>
+generates the formated string to be displayed for the matrix, based on the output of multi. 
+It adds the column header, and row header, makes sure the columns are right-justified. 
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-4-4" class="outline-3">
+<h3 id="sec-4-4"><span class="section-number-3">4.4</span> Overall integration</h3>
+<div class="outline-text-3" id="text-4-4">
+<p>
+(multi-tab-primes n) 
+</p>
+
+<p>
+Returns the string suitable to be displayed 
+    for the multiplication table of the first n primes. 
+    This is the highest level function with side effect. It can be called in main to display the multiplication table. 
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-4-5" class="outline-3">
+<h3 id="sec-4-5"><span class="section-number-3">4.5</span> Test Driven Development (TDD)</h3>
+<div class="outline-text-3" id="text-4-5">
+<p>
+Based on the above design, all functions are developed first with test case(s), which solidify the parameters, and return value, 
+and typical case of input, and the expected output. 
+</p>
+
+<p>
+Then the function is developed based on the specification, and test cases. 
+</p>
+
+<p>
+The design is done to separate concerns of different nature, and properly abstracted, so that each function's specification, and test cases can be defined with 
+little coupling with the other functions as much as possible. 
+</p>
+
+<p>
+Especially, side effect is only limited to the function -main, so that all other function can be tested by values alone, taking advantage of persistence.
+</p>
+
+<p>
+midje plug-in is used to implement automated continuous tests. 
+</p>
+
+<p>
+As the example is rather simple, there is not much to demonstrate the emphasis on behavior driven development (BDD). 
+The major user behavior is the use case of user requesting multiplication table of first n primes. The use case is supported by the function multi-tab-primes, in turns,
+functions are defined and specified to support multi-tab-primes
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-4-6" class="outline-3">
+<h3 id="sec-4-6"><span class="section-number-3">4.6</span> Further Improvement and Extension</h3>
+<div class="outline-text-3" id="text-4-6">
+<ul class="org-ul">
+<li>Arbitrary number of the first prime numbers. By parsing command line argument, it's possible to support arbitrary number of prime numbers.
+</li>
+<li>Provide multiplication table through other user interface, such as web. The design is layered, it's possible to change the representation mechanism to support 
+other user interface.
+</li>
+<li>The command line at the present is not user friendly. The command line is too long. The jar file may be installed in a directory on CLASSPATH 
+so that a user does need to specify the direcotry where the jar file located. 
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-4-7" class="outline-3">
+<h3 id="sec-4-7"><span class="section-number-3">4.7</span> Algorithm of finding prime numbers</h3>
+<div class="outline-text-3" id="text-4-7">
+<p>
+Iterate from existing seeds of primes, to generate the next prime number. The candidate is the largest prime seed plus 2, 4, &#x2026;, (sequence of even numbers). 
+The candidacy is confirmed if the candidate cannot be divided by all the prime seeds.
+(Actually, it's sufficient to check all the prime seeds, whose square is not greater than the candidate.)
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-4-8" class="outline-3">
+<h3 id="sec-4-8"><span class="section-number-3">4.8</span> Performance optimization for function primse, and others</h3>
+<div class="outline-text-3" id="text-4-8">
+<p>
+The complexity of generating the first n pri0me numbers may not be linear to the number n. 
+It takes o(n) number of remainder operations, to tell if a number is a prime or not, 
+but it's hard to tell the complexity to find the next prime number based on the current prime number seeds, 
+as one has to explore the even number bigger than the existing prime numbers. 
+It may not be a function of n at all. 
+It depends on the distribution characteristics of the prime numbers. At the moment, I feel that it's beyond my knowledge and time to investigate 
+the complexity of finding one new prime number. I'll just try to be as economical as possible. 
+</p>
+
+<p>
+In the future, more might be done in controlling the space for prime candidates in additional to assuming it to be odd numbers larger than the current existing prime numebers. 
+</p>
+
+<p>
+In order to reduce computation as much as possible, the following optimization considerations are taken:
+</p>
+<ul class="org-ul">
+<li>After 2, all prime numbers must be odd number, 
+so the candidates of the next prime number after existing number would be start from the largest prime number plus 2, to keep the candidates odd numbers.
+</li>
+
+<li>If a number is divisible by another number, it must be divisible by certain prime numbers. 
+</li>
+</ul>
+<p>
+Such prime numbers should be smaller than the candidate under investigation.
+</p>
+
+<ul class="org-ul">
+<li>Furthermore, it's sufficient to check divisibility with smaller prime number p such that p*p should be less or equal to the candidate under investigation, 
+since, if a number x could be divided by prime number p larger than the square root of x, 
+then there would be another prime number q such that p*q*r = x, where r is another number. 
+In this case, q must be smaller than the square root of x, otherwise, p*q would be larger than x.  
+</li>
+</ul>
+
+<p>
+All the rest of the computation or transformation is of lower complexity, o(n*n), where n is the number of prime numbers.
+</p>
+
+<p>
+As a*b = b*a, the multiplication can be further reduced by about half by doing memoize the computation. 
+</p>
+
+<p>
+The total elapse time of multi-tab-primes for 10 prime numbers is about 33 msecs, when running with 
+</p>
+
+<p>
+java -jar multiplication-table-of-prime-0.1.0-SNAPSHOT-standalone.jar
+</p>
+
+<p>
+However, when running with 
+</p>
+
+<p>
+leni run
+</p>
+
+<p>
+It takes about 13 msecs. The difference is yet to know. 
+</p>
+
+<p>
+By looking at more detailed elapsed time:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-quote">"Elapsed time: 7.731669 msecs" ; (primes 10)
+"Elapsed time: 2.605125 msecs" ; (multi, 
+"Elapsed time: 21.287298 msecs" ; (table-str,
+</pre>
+</div>
+<p>
+I'm surprised that it takes more than 21 msecs to do string format with table-str, more than that of (primes 10) to generate the first 10 prime numbers. 
+It may change when further prime numbers becomes less dense. 
+</p>
+
+<p>
+Overall, it seems the response time is acceptable for current requirements. 
+</p>
+
+<p>
+It would be faster to combine multi and table-str to directly produce the string represenation of the multiplication table, save one round of traversing the matrix. 
+But I feel that it's more coupled. This may be discussed further.  
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><span class="section-number-2">5</span> Project meta</h2>
+<div class="outline-text-2" id="text-5">
+</div><div id="outline-container-sec-5-1" class="outline-3">
+<h3 id="sec-5-1"><span class="section-number-3">5.1</span> Project definition</h3>
+<div class="outline-text-3" id="text-5-1">
+<div class="org-src-container">
+
+<pre class="src src-clojure">(defproject multiplication-table-of-prime "0.1.0-SNAPSHOT"
+  :description "This provides multiplication table of prime numbers"
+  :url ""
+  :license {:name "Eclipse Public License"
+            :url "http://www.eclipse.org/legal/epl-v10.html"}
+  :dependencies [[org.clojure/clojure "1.6.0"]]
+  :main ^:skip-aot multiplication-table-of-prime.core
+  :target-path "target/%s"
+  :profiles {:uberjar {:aot :all}
+             :dev {:dependencies [[midje "1.6.3"]]}})
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-5-2" class="outline-3">
+<h3 id="sec-5-2"><span class="section-number-3">5.2</span> The README</h3>
+<div class="outline-text-3" id="text-5-2">
+<div class="org-src-container">
+
+<pre class="src src-markdown"># multiplication-table-of-prime
+
+This programs provides multiplication table of prime numbers.
+
+## Installation
+
+Place the jar file of multiplication-table-of-prime-0.1.0-SNAPSHOT-standalone.jar
+at a directory which is convenient to access for the user.
+
+## Usage
+
+Execute the following at the command line:
+
+    $ java -jar multiplication-table-of-prime-0.1.0-SNAPSHOT-standalone.jar
+
+Produces a multiplication table of the first 10 prime numbers of 2, 3, 5, 7, 9, ...
+a table of multiplications of the prime numbers will be displayed at STDOUT. 
+
+Assume that the current directory is where the jar file multiplication-table-of-prime-0.1.0-SNAPSHOT-standalone.jar resides.
+
+By default, the jar file
+
+multiplication-table-of-prime-0.1.0-SNAPSHOT-standalone.jar
+
+is at
+
+    &lt;project-root-directory&gt;/target/uberjar
+
+    &lt;project-root-directory&gt;
+
+is the place holder for the root directory of the project for multiplication table of prime numbers. 
+
+## Produce the jar file for the program
+
+At the root directory of the Clojure project, execute the following at the command line:
+
+    $ lein uberjar
+
+## Literate programming
+
+This program is developed with "Literate Programming", the design, test specification, and development can be found at ./design-test-implementation.org
+all source code are generated from it, therefore 
+there is little comments in the source code. To review the code, design, etc., it's better read ./design-test-implementation.html, which is more readable.
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-6" class="outline-2">
+<h2 id="sec-6"><span class="section-number-2">6</span> Source-code</h2>
+<div class="outline-text-2" id="text-6">
+</div><div id="outline-container-sec-6-1" class="outline-3">
+<h3 id="sec-6-1"><span class="section-number-3">6.1</span> Preamble</h3>
+<div class="outline-text-3" id="text-6-1">
+<div class="org-src-container">
+
+<pre class="src src-clojure">(ns multiplication-table-of-prime.core-test
+  (:require [midje.sweet :refer :all]
+            [multiplication-table-of-prime.core :refer :all]
+            ))
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-clojure" id="core">(ns multiplication-table-of-prime.core
+(:gen-class))
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-6-2" class="outline-3">
+<h3 id="sec-6-2"><span class="section-number-3">6.2</span> primes</h3>
+<div class="outline-text-3" id="text-6-2">
+<div class="org-src-container">
+
+<pre class="src src-clojure">(facts "about `primes'"
+       (fact "First prime number"
+             (primes 1) =&gt; [2])
+       (fact "More prime numbers"
+             (primes 3) =&gt; [2 3 5])
+       (fact "First 10 prime numbers"
+             (primes 10) =&gt; [2 3 5 7 11 13 17 19 23 29]))
+</pre>
+</div>
+<p>
+<a id="primes-test" name="primes-test"></a>
+</p>
+<div class="org-src-container">
+
+<pre class="src src-clojure">(defn primes
+  "Produces the first n primes starting from the smallest, 2. It returns a lazy sequence."
+
+  [n]
+  (if (= n 1)
+    [2]
+    (nth 
+     (iterate
+      (fn [seeds]
+        (conj seeds (first
+                     (filter (fn [c] (every? (fn [p] (&lt; 0 (mod c p))) (filter (fn [p] (&lt;= (* p p) c)) seeds)))
+                             (map (partial + (last seeds))
+                                  (filter even? (drop 1 (range)))))))) [2 3])
+     (- n 2))))
+</pre>
+</div>
+
+<p>
+<a id="primes" name="primes"></a>
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-6-3" class="outline-3">
+<h3 id="sec-6-3"><span class="section-number-3">6.3</span> multi</h3>
+<div class="outline-text-3" id="text-6-3">
+<div class="org-src-container">
+
+<pre class="src src-clojure">(facts "about `multi'"
+       (fact "Some multiplications"
+             (multi 3 (range)) =&gt; {:matrix [[0 0 0]
+                                    [0 1 2]
+                                    [0 2 4]]
+                                   :max 4
+                                   :row-header [0 1 2]
+                                   :column-header [0 1 2]}))
+</pre>
+</div>
+<p>
+<a id="multi-test" name="multi-test"></a>
+</p>
+<div class="org-src-container">
+
+<pre class="src src-clojure">(defn multi
+  "Produces the multiplications of the first n numbers in numbers which may be a lazy-sequence, 
+  returns a map with key matrix and value of the computed multiplication table, in terms of sequence of sequences, as sequence of rows
+  and a key of max, with the maximum value in the matrix. 
+  The maximum value may be used to for the width of numbers for properly formatting the multiplication table. 
+  It also returns key of column-row, with value for the header for the columns, 
+  and row-header, with value for each row in the table."
+
+  [n numbers]
+  (let [numbers-realized (take n numbers)
+        *_remembered (memoize (fn [x y] (* x y)))
+        matrix (for [x numbers-realized]
+                 (for [y numbers-realized] (*_remembered x y)))
+        max-value (#(*_remembered % %) (last numbers-realized))]
+    {:matrix matrix :max max-value
+     :row-header numbers-realized :column-header numbers-realized}))
+</pre>
+</div>
+
+<p>
+<a id="multi" name="multi"></a>
+</p>
+</div>
+</div>
+
+
+<div id="outline-container-sec-6-4" class="outline-3">
+<h3 id="sec-6-4"><span class="section-number-3">6.4</span> table-str</h3>
+<div class="outline-text-3" id="text-6-4">
+<div class="org-src-container">
+
+<pre class="src src-clojure">(facts "about `table-str'"
+       (fact "matrix as a table as a string"
+             (table-str {:matrix [[0 0 0]
+                                      [0 1 2]
+                                      [0 200 4]]
+                         :max 200
+                         :row-header [0 1 2]
+                         :column-header [0 1 2]})
+             =&gt; "       0   1   2\n   0   0   0   0\n   1   0   1   2\n   2   0 200   4")
+ )
+</pre>
+</div>
+
+<p>
+<a id="table-str-test" name="table-str-test"></a>
+</p>
+<div class="org-src-container">
+
+<pre class="src src-clojure">(defn table-str 
+  "generates the formated string to be displayed for the matrix, based on the output of multi. 
+  It adds the column header, and row header, makes sure the columns are right-justified. "
+
+  [{:keys [matrix max row-header column-header]}]
+  (let [width (count (str max))]
+    (let [number-str #(format (str " %" width "d") %)
+          row-header-width (count (number-str (first row-header)))]
+      (str
+       (apply str (concat (repeat row-header-width " ") (map number-str column-header))) "\n"
+       (clojure.string/join "\n"
+                            (for [i (range (count matrix))]
+                              (str (number-str (nth row-header i))
+                                   (apply str (for [x (nth matrix i)] (number-str x))))))))))
+</pre>
+</div>
+
+<p>
+<a id="table-str" name="table-str"></a>
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-6-5" class="outline-3">
+<h3 id="sec-6-5"><span class="section-number-3">6.5</span> multi-tab-primes</h3>
+<div class="outline-text-3" id="text-6-5">
+<div class="org-src-container">
+
+<pre class="src src-clojure">(facts "about `multi-tab-primes'"
+       (fact "multiplication table for the first 3 prime numbers"
+             (multi-tab-primes 3) =&gt;
+             "     2  3  5\n  2  4  6 10\n  3  6  9 15\n  5 10 15 25")
+ )
+</pre>
+</div>
+<p>
+<a id="multi-tab-primes-test" name="multi-tab-primes-test"></a>
+</p>
+<div class="org-src-container">
+
+<pre class="src src-clojure">(defn multi-tab-primes
+  "Returns the string suitable to be displayed 
+  for the multiplication table of the first n primes."
+
+  [n]
+  (let [prime-nbrs (time (primes n))
+        mat (time (multi n prime-nbrs))
+        s (time (table-str mat))]
+    s
+    ;; (-&gt;&gt; prime-nbrs
+    ;;      (multi n,)
+    ;;      table-str)
+    )
+  )
+</pre>
+</div>
+
+<p>
+<a id="multi-tab-primes" name="multi-tab-primes"></a>
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-6-6" class="outline-3">
+<h3 id="sec-6-6"><span class="section-number-3">6.6</span> main</h3>
+<div class="outline-text-3" id="text-6-6">
+<div class="org-src-container">
+
+<pre class="src src-clojure">(defn -main
+  "Calculate and display multiplication table of the first 10 prime numbers."
+
+  [&amp; args]
+  ;; Check the response time of generating the multiplication table.
+  ;; (println (time (multi-tab-primes 10)))
+  (println (multi-tab-primes 10))
+  )
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-7" class="outline-2">
+<h2 id="sec-7"><span class="section-number-2">7</span> Appendix</h2>
+<div class="outline-text-2" id="text-7">
+<p>
+This file is for literate programming. It's adapted from Kai Wu's "Clojure Default/Project Skeleton, Using Org Literate Programming"
+</p>
+
+<p>
+The following excepted from his introduction.
+</p>
+</div>
+
+<div id="outline-container-sec-7-1" class="outline-3">
+<h3 id="sec-7-1"><span class="section-number-3">7.1</span> Meta: this file, Clojure + Org → LP, etc.</h3>
+<div class="outline-text-3" id="text-7-1">
+<p>
+You're looking at a literate programming (LP) file, specifically an
+<a href="http://orgmode.org">Org mode</a> formatted file combining both documentation (Org's structured
+markup) and code blocks (Clojure code).
+</p>
+
+<p>
+For best results please <b>use Emacs 24.3 or later to view this</b> <code>.org</code>
+<b>file</b>. If you're looking at this on Github.com, STOP - the rendering
+there is neither complete nor correct!
+</p>
+</div>
+
+<div id="outline-container-sec-7-1-1" class="outline-4">
+<h4 id="sec-7-1-1"><span class="section-number-4">7.1.1</span> The <b>benefits</b> of LP using Emacs + Org</h4>
+<div class="outline-text-4" id="text-7-1-1">
+<ol class="org-ol">
+<li>Docs matter, a lot. With LP, documentation is integral to
+development, never an afterthought.
+<ul class="org-ul">
+<li>For all but small throwaway systems, you're likely keeping a
+separate file of development notes already; LP would integrate
+that.
+</li>
+</ul>
+</li>
+<li>With one LP file, avoid the incidental/inessential complexity of
+the filesystem: avoid context-switch overhead moving between files,
+and sidestep your language's imposed filesystem structure.
+</li>
+<li>Org rocks for prose:
+<ul class="org-ul">
+<li>Org's plain-text <b>markup is lightweight</b>, yet more powerful than
+Markdown, and cleaner than rST.
+</li>
+<li>The <b>structural editing</b> provided by Org documents lets you
+organize your thoughts/writing/code very quickly.  With good
+structure even major revisions are easy.
+</li>
+<li>Org's exporter lets your <b>write-once, express-many-times</b>: you
+can export an Org file to HTML (e.g. for blogging) or LaTeX
+(for serious publishing).
+</li>
+<li>It's easy to version-control Org files.
+</li>
+</ul>
+</li>
+<li>Org rocks for code:
+<ul class="org-ul">
+<li>Each code block has flexible granularity: can be named and
+referred to; evaluated or not; have data sent in or exported;
+specify different REPL sessions; specify different target/tangled
+files.
+</li>
+<li>Code blocks are syntax-highlighted.
+</li>
+<li>Code blocks are ready to edit: jump to major-mode editing easily.
+</li>
+<li>A single Org file can mix different languages.
+</li>
+</ul>
+</li>
+<li>Meta-development, manage complexity from a coherent perspective: a
+unified, single-file approach encourages holistic software
+development and exposition, in a natural order, using structure to
+enhance understanding.  LP is not just documentation and code
+together: it's a <b>process and abstraction unifying the development
+lifecycle</b>: requirements, architecture, design, code, tests,
+deployment, and maintenance - can all be bound coherently in one
+active format.
+</li>
+</ol>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-7-2" class="outline-3">
+<h3 id="sec-7-2"><span class="section-number-3">7.2</span> Using this file</h3>
+<div class="outline-text-3" id="text-7-2">
+</div><div id="outline-container-sec-7-2-1" class="outline-4">
+<h4 id="sec-7-2-1"><span class="section-number-4">7.2.1</span> Prerequisites</h4>
+<div class="outline-text-4" id="text-7-2-1">
+<ol class="org-ol">
+<li>A recent version of Emacs, 24.3+.
+</li>
+<li>Both org-mode (included w/ Emacs 24) and <code>clojure-mode</code> installed;
+use Emacs ELPA as needed.
+<ul class="org-ul">
+<li>Consider using an Emacs "starter package" that provides a good
+baseline, like <a href="http://batsov.com/prelude/">Emacs Prelude</a> or <a href="http://overtone.github.io/emacs-live/">Emacs Live</a>.
+</li>
+</ul>
+</li>
+</ol>
+
+<p>
+Then if you start Emacs and load this file, you'll see it the way it's
+meant to be seen: as a multi-level, hierarchically organized and
+structured literate code file, w/ syntax-highlighted code blocks.  
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-7-2-2" class="outline-4">
+<h4 id="sec-7-2-2"><span class="section-number-4">7.2.2</span> Weaving and tangling</h4>
+<div class="outline-text-4" id="text-7-2-2">
+<p>
+To use the original Knuth terminology, this single file can be <i>woven</i>
+into documentation, or <i>tangled</i> to code.
+</p>
+</div>
+
+<ol class="org-ol"><li><a id="sec-7-2-2-1" name="sec-7-2-2-1"></a>Weave/export, to documentation<br  /><div class="outline-text-5" id="text-7-2-2-1">
+<ul class="org-ul">
+<li>To <i>weave</i>: the Org equivalent of <i>weaving</i> is to export this file,
+typically to HTML or LaTeX/PDF. The keystroke is <code>C-c-e</code> i.e. hold
+down the Control key while pressing "c" then "e" to view the export
+options.
+<ul class="org-ul">
+<li>e.g. export this file to HTML with <code>CTRL-c-e h</code> or, to see it
+immediately in a browser window, <code>CTRL-c-e b</code>.
+</li>
+</ul>
+</li>
+<li>You don't have to export this file though; if/when you're comfy in
+Emacs, the Org format itself is great.
+</li>
+</ul>
+</div>
+</li>
+
+<li><a id="sec-7-2-2-2" name="sec-7-2-2-2"></a>Tangle, to code<br  /><div class="outline-text-5" id="text-7-2-2-2">
+<ul class="org-ul">
+<li>To <i>tangle</i>: in Org, it's the same word/term. <code>C-c-v-t</code> will cause
+all designated code blocks in this file to appear in the filesystem.
+Here, the code blocks go to files and directories matching a new
+Clojure app, as would be produced by <code>lein new app
+  the-project-name</code>.
+</li>
+</ul>
+</div>
+</li></ol>
+</div>
+
+<div id="outline-container-sec-7-2-3" class="outline-4">
+<h4 id="sec-7-2-3"><span class="section-number-4">7.2.3</span> Other coolness</h4>
+<div class="outline-text-4" id="text-7-2-3">
+<ul class="org-ul">
+<li><code>SHIFT-TAB</code> will <b>cycle</b> the display: top-level headings only, all
+headings, or fully-expanded.
+</li>
+<li>Within a code block, <code>CTRL-c</code> ='= will open a buffer to edit the
+code. For full power, be sure <code>clojure-mode</code>, <code>paredit</code>, and
+<code>nrepl</code> are installed.
+</li>
+<li>Org docs: see <a href="http://orgmode.org/org.html">main documentation</a>, especially sections on <a href="http://orgmode.org/org.html#Document-Structure">structure</a>,
+<a href="http://orgmode.org/org.html#Hyperlinks">links</a>, <a href="http://orgmode.org/org.html#Markup">markup</a>, and <a href="http://orgmode.org/org.html#Working-With-Source-Code">literate programming</a> features.
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">Author: Yu Shen</p>
+<p class="date">Created: 2015-07-02 Thu 08:14</p>
+<p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 24.5.1 (<a href="http://orgmode.org">Org</a> mode 8.2.10)</p>
+<p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>

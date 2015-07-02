@@ -36,3 +36,9 @@ is the place holder for the root directory of the project for multiplication tab
 At the root directory of the Clojure project, execute the following at the command line:
 
     $ lein uberjar
+
+## Literate programming
+
+This program is developed with "Literate Programming". The design, test specification, and development can be found at [Literate Programming Workbook](./design-test-implementation.org)
+all source code are generated from it, therefore 
+there is little comments in the source code. To review the code, design, etc., it's better read [Literate Programming Presentation](./design-test-implementation.html), which is more readable.
