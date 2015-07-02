@@ -168,7 +168,7 @@ The candidacy is confirmed if the candidate cannot be divided by all the prime s
 ** Performance optimization for function primse, and others
 
 The complexity of generating the first n pri0me numbers may not be linear to the number n. 
-It takes o(n) number of remainder operations, to tell if a number is a prime or not, 
+It takes O(n) number of remainder operations, to tell if a number is a prime or not, 
 but it's hard to tell the complexity to find the next prime number based on the current prime number seeds, 
 as one has to explore the even number bigger than the existing prime numbers. 
 It may not be a function of n at all. 
@@ -189,7 +189,7 @@ Such prime numbers should be smaller than the candidate under investigation.
     then there would be another prime number q such that p*q*r = x, where r is another number. 
     In this case, q must be smaller than the square root of x, otherwise, p*q would be larger than x.  
 
-All the rest of the computation or transformation is of lower complexity, o(n*n), where n is the number of prime numbers.
+All the rest of the computation or transformation is of lower complexity, O(n*n), where n is the number of prime numbers.
 
 As a*b = b*a, the multiplication can be further reduced by about half by doing memoize the computation. 
 
