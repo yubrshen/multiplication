@@ -41,8 +41,8 @@ At the root directory of the Clojure project, execute the following at the comma
 
 This program is developed with "Literate Programming". 
 The design, test specification, and development can be found at
-[Literate Programming Workbook](./design-test-implementation.org)
+[design-test-implementation](./design-test-implementation.org)
 All source code are generated from it, therefore 
 there is little comments in the source code.
-To review the code, design, etc., it's better read [Literate Programming Workbook](./design-test-implementation.org),
+To review the code, design, etc., it's better read [design-test-implementation](./design-test-implementation.org),
 which is more readable.
