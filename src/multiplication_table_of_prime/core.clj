@@ -1,21 +1,27 @@
 
 (ns multiplication-table-of-prime.core
-(:gen-class))
+    (:gen-class)
+    (:require [utils-yushen.util :as util]
+))
 
 (defn primes
-  "Produces the first n primes starting from the smallest, 2. It returns a lazy sequence."
-
-  [n]
-  (if (= n 1)
-    [2]
-    (nth 
-     (iterate
-      (fn [seeds]
-        (conj seeds (first
-                     (filter (fn [c] (every? (fn [p] (< 0 (mod c p))) (filter (fn [p] (<= (* p p) c)) seeds)))
-                             (map (partial + (last seeds))
-                                  (filter even? (drop 1 (range)))))))) [2 3])
-     (- n 2))))
+  "Produce a lazy-sequence of prime numbers starting from the smallest prime, 2."
+  []
+  (letfn [(is_prime? [seeds c] ; whether c is prime according to the seeds of primes
+            (every? (fn [p] (< 0 (mod c p)))
+                    (filter (fn [p] (<= (* p p) c)) seeds) ; sufficient subset of seeds to tell if c is prime
+                    ))
+          (next-candidates [seeds] ; the candidates, in lazy sequence, of prime number based on the seeds of prime numbers
+            (map (partial + (last seeds))
+                 (map (partial * 2) (drop 1 (range)))) ; the candidates are the last of the seeds + even numbers
+            )
+          (primes-next [seeds]
+            (let [prime-next ; the next prime after the last of the seeds
+                  (util/dbg (first (filter (partial is_prime? seeds) (next-candidates seeds))))]
+              (concat [prime-next] (lazy-seq (primes-next (util/dbg (concat seeds [prime-next]))))))
+            )]
+    (let [initial-seeds [ 2 3 ]] (concat initial-seeds (primes-next initial-seeds))))
+  )
 
 (defn multi
   "Produces the multiplications of the first n numbers in numbers which may be a lazy-sequence, 
@@ -54,14 +60,14 @@
   for the multiplication table of the first n primes."
 
   [n]
-  (let [prime-nbrs (time (primes n))
+  (let [prime-nbrs (time (primes))
         mat (time (multi n prime-nbrs))
         s (time (table-str mat))]
     s
-    ;; (->> prime-nbrs
+    ;; (->> (primes) 
     ;;      (multi n,)
     ;;      table-str)
-    )
+   )
   )
 
 (defn -main

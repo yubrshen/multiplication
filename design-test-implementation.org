@@ -106,6 +106,11 @@ For the computation, there will be the following functions:
 produces the first n primes starting from the smallest, 2. It returns a lazy sequence to be efficient, and responsive. 
 Care has been taken to reduce computation as much as possible. 
 
+(primes)
+
+Produce a lazy-sequence of primes starting from the minimum, 2, 3, .... 
+Care has been taken to reduce computation as much as possible. 
+
 (multi n numbers) 
 
 produces the multiplications of the first n numbers in numbers which may be a lazy-sequence, 
@@ -226,7 +231,9 @@ But I feel that it's more coupled. This may be discussed further.
     :url ""
     :license {:name "Eclipse Public License"
               :url "http://www.eclipse.org/legal/epl-v10.html"}
-    :dependencies [[org.clojure/clojure "1.6.0"]]
+    :dependencies [[org.clojure/clojure "1.6.0"]
+                   [utils-yushen "0.1.0-SNAPSHOT"]
+                   ]
     :main ^:skip-aot multiplication-table-of-prime.core
     :target-path "target/%s"
     :profiles {:uberjar {:aot :all}
@@ -298,13 +305,59 @@ But I feel that it's more coupled. This may be discussed further.
 #+NAME: core
 #+BEGIN_SRC clojure :tangle src/multiplication_table_of_prime/core.clj
   (ns multiplication-table-of-prime.core
-  (:gen-class))
+    (:gen-class)
+    (:require [utils-yushen.util :as util]
+))
+
 #+END_SRC
 
 ** primes
+*** A new implementation
+
+A more idiomatic design and implementation of primes without parameter. 
+
+#+NAME:primes-1-test
+#+BEGIN_SRC clojure :tangle test/multiplication_table_of_prime/core_test.clj
+  (facts "about `primes'"
+         (fact "First prime number"
+               (take 1 (primes)) => [2])
+         (fact "More prime numbers"
+               (take 3 (primes)) => [2 3 5])
+         (fact "First 10 prime numbers"
+               (take 10 (primes)) => [2 3 5 7 11 13 17 19 23 29]))
+ #+END_SRC
+<<primes-1-test>>
+#+NAME:primes-1
+#+BEGIN_SRC clojure :tangle src/multiplication_table_of_prime/core.clj
+  (defn primes
+    "Produce a lazy-sequence of prime numbers starting from the smallest prime, 2."
+    []
+    (letfn [(is_prime? [seeds c] ; whether c is prime according to the seeds of primes
+              (every? (fn [p] (< 0 (mod c p)))
+                      (filter (fn [p] (<= (* p p) c)) seeds) ; sufficient subset of seeds to tell if c is prime
+                      ))
+            (next-candidates [seeds] ; the candidates, in lazy sequence, of prime number based on the seeds of prime numbers
+              (map (partial + (last seeds))
+                   (map (partial * 2) (drop 1 (range)))) ; the candidates are the last of the seeds + even numbers
+              )
+            (primes-next [seeds]
+              (let [prime-next ; the next prime after the last of the seeds
+                    (first (filter (partial is_prime? seeds) (next-candidates seeds)))]
+                (concat [prime-next] (lazy-seq (primes-next (conj prime-next seeds)))))
+              )]
+      (let [initial-seeds [ 2 3 ]] (concat initial-seeds (primes-next initial-seeds))))
+    )
+
+ #+END_SRC
+
+<<primes-1>>
+
+*** Old implementation
+
+This implementation is not as idiomatic. It's replaced by a new implementation. It's kept here as a lesson. 
 
 #+NAME:primes-test
-#+BEGIN_SRC clojure :tangle test/multiplication_table_of_prime/core_test.clj
+#+BEGIN_SRC clojure
   (facts "about `primes'"
          (fact "First prime number"
                (primes 1) => [2])
@@ -315,21 +368,32 @@ But I feel that it's more coupled. This may be discussed further.
  #+END_SRC
 <<primes-test>>
 #+NAME:primes
-#+BEGIN_SRC clojure :tangle src/multiplication_table_of_prime/core.clj
+#+BEGIN_SRC clojure
   (defn primes
     "Produces the first n primes starting from the smallest, 2. It returns a lazy sequence."
 
     [n]
-    (if (= n 1)
-      [2]
-      (nth 
-       (iterate
-        (fn [seeds]
-          (conj seeds (first
-                       (filter (fn [c] (every? (fn [p] (< 0 (mod c p))) (filter (fn [p] (<= (* p p) c)) seeds)))
-                               (map (partial + (last seeds))
-                                    (filter even? (drop 1 (range)))))))) [2 3])
-       (- n 2))))
+    (cond
+      (< n 0) nil
+      (= n 1) [2]
+      :else (nth 
+             (iterate
+              (fn [seeds]
+                (letfn [(is_prime? [seeds c]
+                                          ; whether c is prime according to the seeds of primes
+                          (every? (fn [p] (< 0 (mod c p)))
+                                  (filter (fn [p] (<= (* p p) c)) seeds) ; sufficient subset of seeds to tell if c is prime
+                                  ))
+                        (next-candidates [seeds]
+                                          ; the candidates, in lazy sequence, of prime number based on the seeds of prime numbers
+                          (map (partial + (last seeds))
+                               (map (partial * 2) (drop 1 (range))))
+                                          ; the candidates are the last of the seeds + even numbers
+                          )]
+                  (conj seeds (first
+                               (filter (partial is_prime? seeds) (next-candidates seeds)
+                                       ))))) [2 3])
+             (- n 2))))
  #+END_SRC
 
 <<primes>>
@@ -426,14 +490,14 @@ But I feel that it's more coupled. This may be discussed further.
     for the multiplication table of the first n primes."
 
     [n]
-    (let [prime-nbrs (time (primes n))
+    (let [prime-nbrs (time (primes))
           mat (time (multi n prime-nbrs))
           s (time (table-str mat))]
       s
-      ;; (->> prime-nbrs
+      ;; (->> (primes) 
       ;;      (multi n,)
       ;;      table-str)
-      )
+     )
     )
  #+END_SRC
 

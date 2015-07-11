@@ -6,11 +6,11 @@
 
 (facts "about `primes'"
        (fact "First prime number"
-             (primes 1) => [2])
+             (take 1 (primes)) => [2])
        (fact "More prime numbers"
-             (primes 3) => [2 3 5])
+             (take 3 (primes)) => [2 3 5])
        (fact "First 10 prime numbers"
-             (primes 10) => [2 3 5 7 11 13 17 19 23 29]))
+             (take 10 (primes)) => [2 3 5 7 11 13 17 19 23 29]))
 
 (facts "about `multi'"
        (fact "Some multiplications"
