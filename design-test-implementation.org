@@ -101,11 +101,6 @@ For the user interface, the function -main will implement the command
 
 For the computation, there will be the following functions:
 
-(primes n) 
-
-produces the first n primes starting from the smallest, 2. It returns a lazy sequence to be efficient, and responsive. 
-Care has been taken to reduce computation as much as possible. 
-
 (primes)
 
 Produce a lazy-sequence of primes starting from the minimum, 2, 3, .... 
@@ -232,7 +227,7 @@ But I feel that it's more coupled. This may be discussed further.
     :license {:name "Eclipse Public License"
               :url "http://www.eclipse.org/legal/epl-v10.html"}
     :dependencies [[org.clojure/clojure "1.6.0"]
-                   [utils-yushen "0.1.0-SNAPSHOT"]
+                   ;; [utils-yushen "0.1.0-SNAPSHOT"]
                    ]
     :main ^:skip-aot multiplication-table-of-prime.core
     :target-path "target/%s"
@@ -306,8 +301,8 @@ But I feel that it's more coupled. This may be discussed further.
 #+BEGIN_SRC clojure :tangle src/multiplication_table_of_prime/core.clj
   (ns multiplication-table-of-prime.core
     (:gen-class)
-    (:require [utils-yushen.util :as util]
-))
+    ;; (:require [utils-yushen.util :as util])
+)
 
 #+END_SRC
 
@@ -343,12 +338,17 @@ A more idiomatic design and implementation of primes without parameter.
             (primes-next [seeds]
               (let [prime-next ; the next prime after the last of the seeds
                     (first (filter (partial is_prime? seeds) (next-candidates seeds)))]
-                (concat [prime-next] (lazy-seq (primes-next (conj prime-next seeds)))))
+                (concat [prime-next] (lazy-seq (primes-next (concat seeds [prime-next])))))
               )]
       (let [initial-seeds [ 2 3 ]] (concat initial-seeds (primes-next initial-seeds))))
     )
 
  #+END_SRC
+In the above implementation for the expansion of seeds, it must be (concat seeds [prime-next]) rather than
+ (conj prime-next seeds)
+the later will cause no expansion, resulting the error of "(take 4 (primes))
+ClassCastException java.lang.Long cannot be cast to clojure.lang.IPersistentCollection  clojure.core/conj (core.clj:83)"
+
 
 <<primes-1>>
 

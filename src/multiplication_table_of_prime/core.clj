@@ -1,8 +1,8 @@
 
 (ns multiplication-table-of-prime.core
     (:gen-class)
-    (:require [utils-yushen.util :as util]
-))
+    ;; (:require [utils-yushen.util :as util])
+)
 
 (defn primes
   "Produce a lazy-sequence of prime numbers starting from the smallest prime, 2."
@@ -17,8 +17,8 @@
             )
           (primes-next [seeds]
             (let [prime-next ; the next prime after the last of the seeds
-                  (util/dbg (first (filter (partial is_prime? seeds) (next-candidates seeds))))]
-              (concat [prime-next] (lazy-seq (primes-next (util/dbg (concat seeds [prime-next]))))))
+                  (first (filter (partial is_prime? seeds) (next-candidates seeds)))]
+              (concat [prime-next] (lazy-seq (primes-next (concat seeds [prime-next])))))
             )]
     (let [initial-seeds [ 2 3 ]] (concat initial-seeds (primes-next initial-seeds))))
   )
